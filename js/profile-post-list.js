@@ -6,19 +6,21 @@ window.onload = function () {
 
 
 function getPostList() {
-    const jwt = localStorage.getItem('jwtToken');
-    if (!jwt) {
+    /*const jwt = localStorage.getItem('token');
+    console.log(localStorage.getItem("token"))*/
+    /*if (!jwt) {
         window.location.href = './login.html';
+
         return;
-    }
+    }*/
     const lang = document.getElementById("current-lang").textContent;
 
-    fetch("http://localhost:8080/post/profile", {
+    fetch("http://localhost:8080/api/post/get-all-posts-owner", {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
             'Accept-Language': lang,
-            'Authorization': 'Bearer ' + jwt
+            'Authorization': 'Bearer ' + "eyJhbGciOiJIUzUxMiJ9.eyJyb2xlcyI6IlVTRVIiLCJpZCI6IjMiLCJ1c2VybmFtZSI6ImRkaWl5eW9vcnIwMDFAZ21haWwuY29tIiwic3ViIjoiZGRpaXl5b29ycjAwMUBnbWFpbC5jb20iLCJpYXQiOjE3Mzk3OTQzMjMsImV4cCI6MTczOTg4MDcyM30.hSm1njz_HNjPbk5taFxsQFHgWVUiEXvzXgG0sWtsfDN04TqZYRYFHTBLNv7R0Y1ZDez4CQR0wT91hC1FJ0DDyA"
         }
     }).then(response => {
         if (response.ok) {

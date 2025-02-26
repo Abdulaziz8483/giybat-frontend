@@ -14,9 +14,43 @@ window.onload = function () {
 };
 
 function profileDetailUpdate() {
-    const name = document.getElementById("profile_settings_name").value
+    const jwt = localStorage.getItem('jwtToken');
+    const newName = document.getElementById("profile_settings_name").value
 
-   }
+    if (!jwt){
+        window.location.href = './login.html';
+        return;
+    }
+
+    fetch('http://localhost:8080/api/profile/update-name',{
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer '  +jwt
+        },
+        body: JSON.stringify({name: newName})
+    })
+        .then(response => {
+            if (!response.ok){
+                throw new Error('Network response was not ok');
+            }
+            let userDetail = localStorage.getItem('userDetail');
+            userDetail = JSON.parse(userDetail);
+            userDetail.name = newName;
+            localStorage.setItem("userDetail",JSON.stringify(userDetail));
+            console.log(localStorage.getItem('userDetail'))
+            return response.json();
+        })
+        .then(data => {
+            console.log('Success', data)
+            alert('Name updated successfully!');
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to update name.');
+        });
+
+}
 
 function profilePasswordUpdate() {
     const currentPswd = document.getElementById("profile_settings_current_pswd").value
@@ -70,7 +104,7 @@ function previewImage(event) {
 
 // ------------ Image upload ------------
 function uploadImage() {
-    /*const fileInput = document.getElementById('imageUpload');
+    const fileInput = document.getElementById('imageUpload');
     const file = fileInput.files[0];
     if (file) {
         const formData = new FormData();
@@ -83,7 +117,7 @@ function uploadImage() {
         }
         const lang = document.getElementById("current-lang").textContent;
 
-        fetch('http://localhost:8080/attach/upload', {
+        fetch('http://localhost:8080/api/attach/upload', {
             method: 'POST',
             headers: {
                 'Accept-Language': lang,
@@ -109,13 +143,23 @@ function uploadImage() {
                     userDetail.photo.url = data.url;
                     localStorage.setItem("userDetail", JSON.stringify(userDetail));
 
-                   // document.getElementById("header_user_image_id").src =data.url;
+                    // document.getElementById("header_user_image_id").src =data.url;
                 }
+                return fetch('http://localhost:8080/api/profile/update-photo',{
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + jwt
+                    },
+
+                    body: JSON.stringify({photoId: data.id})
+                })
             })
+
             .catch(error => {
                 console.error('Error:', error);
             });
-    }*/
+    }
 }
 
 function updateProfileImage(photoId) {

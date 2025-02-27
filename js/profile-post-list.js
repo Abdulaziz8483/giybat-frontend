@@ -6,21 +6,21 @@ window.onload = function () {
 
 
 function getPostList() {
-    /*const jwt = localStorage.getItem('token');
-    console.log(localStorage.getItem("token"))*/
-    /*if (!jwt) {
+    const jwt = localStorage.getItem('token');
+    console.log(localStorage.getItem("token"))
+    if (!jwt) {
         window.location.href = './login.html';
-
         return;
-    }*/
+    }
     const lang = document.getElementById("current-lang").textContent;
-
+    const token = localStorage.getItem("jwtToken");
+    console.log(token);
     fetch("http://localhost:8080/api/post/get-all-posts-owner", {
         method: 'GET',
         headers: {
             'Content-Type': 'application/json',
             'Accept-Language': lang,
-            'Authorization': 'Bearer ' + "eyJhbGciOiJIUzUxMiJ9.eyJyb2xlcyI6IlVTRVIiLCJpZCI6IjMiLCJ1c2VybmFtZSI6ImRkaWl5eW9vcnIwMDFAZ21haWwuY29tIiwic3ViIjoiZGRpaXl5b29ycjAwMUBnbWFpbC5jb20iLCJpYXQiOjE3Mzk3OTQzMjMsImV4cCI6MTczOTg4MDcyM30.hSm1njz_HNjPbk5taFxsQFHgWVUiEXvzXgG0sWtsfDN04TqZYRYFHTBLNv7R0Y1ZDez4CQR0wT91hC1FJ0DDyA"
+            'Authorization': 'Bearer ' + token
         }
     }).then(response => {
         if (response.ok) {
@@ -42,6 +42,7 @@ function showPostList(postList) {
     const parent = document.getElementById("profile_post_container_id")
     postList.forEach(postItem => {
         //
+        //console.log(postItem.photo.id)
         const div = document.createElement("div");
         div.classList.add("position-relative", "post_box");
 
@@ -55,9 +56,10 @@ function showPostList(postList) {
         imageDiv.classList.add("post_img__box");
         // image
         const img = document.createElement("img");
-        if (postItem.photo && postItem.photo.id) {
-            img.src = postItem.photo.url;
+        if (postItem.photoUrl && postItem.photoId) {
+            img.src = postItem.photoUrl;
         } else {
+
             img.src = './images/post-default-img.jpg';
         }
         img.classList.add('post_img');

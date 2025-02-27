@@ -1,14 +1,43 @@
 async function createPost() {
 
-    // const fileInput = document.getElementById('post_image_id');
-    // const file = fileInput.files[0];
-    // const titleValue = document.getElementById("post_title_id").value;
-    // const contentValue = document.getElementById("post_content_id").value;
-    //
-    // if (!file || !titleValue || !contentValue) {
-    //     alert("Enter all inputs")
-    //     return;
-    // }
+    const fileInput = document.getElementById('post_image_id');
+    const file = fileInput.files[0];
+    const titleValue = document.getElementById("post_title_id").value;
+    const contentValue = document.getElementById("post_content_id").value;
+
+    const lang = document.getElementById("current-lang").textContent;
+    const jwt = localStorage.getItem("jwtToken");
+
+    const postData = {
+        title: titleValue,
+        content: contentValue,
+        photoId: "91eb4392-c52f-4f0a-96cd-b808d88c1c9f.jpg"
+    }
+    console.log(postData)
+    console.log(titleValue, contentValue, fileInput);
+
+    if (!file || !titleValue || !contentValue) {
+        alert("Enter all inputs")
+        return;
+    }
+    fetch("http://localhost:8080/api/post",{
+        method: 'POST',
+        headers: {
+            'Accept-Language': lang,
+            'Authorization': 'Bearer '+ jwt,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(postData)
+    })
+        .then(response =>{
+            if (!response.ok){
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .catch(error => {
+            console.error('Error', error);
+        })
 
 }
 
@@ -34,6 +63,7 @@ async function uploadImage() {
         const formData = new FormData();
         formData.append('file', file);
 
+
         const jwt = localStorage.getItem('jwtToken');
         if (!jwt) {
             window.location.href = './login.html';
@@ -41,7 +71,7 @@ async function uploadImage() {
         }
         const lang = document.getElementById("current-lang").textContent;
 
-        return fetch('http://localhost:8080/attach/upload', {
+        return fetch('http://localhost:8080/api/attach/upload', {
             method: 'POST',
             headers: {
                 'Accept-Language': lang,

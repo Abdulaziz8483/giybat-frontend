@@ -55,12 +55,96 @@ function profileDetailUpdate() {
 function profilePasswordUpdate() {
     const currentPswd = document.getElementById("profile_settings_current_pswd").value
     const newPswd = document.getElementById("profile_settings_new_pswd").value
+    const jwt = localStorage.getItem('jwtToken');
 
+    const postData = {
+        oldPassword: currentPswd,
+        newPassword: newPswd
+    }
+    fetch('http://localhost:8080/api/profile/update-password', {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + jwt
+        },
+        body: JSON.stringify(postData)
+    })
+        .then(async response => {
+            const contentType = response.headers.get("content-type");
+
+            if (!response.ok) {
+                if (contentType && contentType.includes("application/json")) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || "Unknown error occurred");
+                } else {
+                    const errorText = await response.text();
+                    throw new Error(errorText);
+                }
+            }
+
+            return response.json();
+        })
+        .then(data => {
+            console.log("Password updated successfully");
+            window.location.href = "profile-settings.html";
+        })
+        .catch(error => {
+            console.log("Error:", error.message);
+            alert(error.message); // Xatoni foydalanuvchiga ko‘rsatish
+        });
 }
 
 function profileUserNameChange() {
-    const username = document.getElementById("profile_settings_username").value
+    const inputUsername = document.getElementById("profile_settings_username").value
+    const jwt = localStorage.getItem("jwtToken");
+    const updateUsername ={
+        username: inputUsername
+    }
+    fetch("http://localhost:8080/api/profile/update-username",{
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer ' + jwt,
+        },
+        body: JSON.stringify(updateUsername)
+    })
+        .then(async response => {
+            const contentType = response.headers.get('content-type')
 
+            if (!response.ok){
+                if(contentType && contentType.includes("application/json")){
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || "Unknown error occurred");
+                } else {
+                    const errorText = await response.text();
+                    throw new Error(errorText.trim());
+                }
+            }
+            if (contentType && contentType.includes("application/json")){
+                return response.json();
+            }else {
+                return response.text();
+            }
+
+        })
+        .then(data => {
+            console.log("Server response: ",data)
+
+            if(typeof data === "string" && data.includes("unchanged")){
+                alert("Siz avvalgi username'ni kiritingiz!")
+            }else {
+                const user = JSON.parse(localStorage.getItem("userDetail"));
+                console.log("Username updated successfully");
+                user["username"] = inputUsername;
+                localStorage.setItem("userDetail", JSON.stringify(user));
+                alert("Username muvaffaqiyatili yangilandi ");
+                window.location.href = "profile-settings.html"
+            }
+        })
+        .catch(error =>{
+            console.log("Error:", error.message);
+            alert(error.message);
+        });
 }
 
 function profileUserNameChangeConfirm() {

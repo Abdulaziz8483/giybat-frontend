@@ -35,6 +35,9 @@ async function createPost() {
             }
             return response.json();
         })
+        .then(data =>{
+            console.log("Response Data", data);
+        })
         .catch(error => {
             console.error('Error', error);
         })
